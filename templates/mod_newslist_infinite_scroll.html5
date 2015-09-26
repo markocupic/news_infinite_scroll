@@ -1,0 +1,120 @@
+<?php if(\Input::get('infiniteScrollNewsLoader')): ?>
+    <?php if (!empty($this->articles)): ?>
+    <?= implode('', $this->articles) ?>
+    <?php endif; ?>
+<?php else: ?>
+<? if ($this->itemsToLoad != ''): ?>
+<?= $this->itemsToLoad ?>
+<script>
+(function ($) {
+    $(document).ready(function () {
+
+        // Generate urls
+        var arrUrl = (function(){
+            var loadAtOnce = 2;
+            var items = 0;
+            var urls = [];
+            var ids = [];
+
+            var size =  $('.inifinite-scroll-news-to-load-<?= $this->id ?>').size();
+            $('.inifinite-scroll-news-to-load-<?= $this->id ?>').each(function (index) {
+                items++;
+                ids.push($(this).attr('data-news-id'));
+                if(items == loadAtOnce || size == (index + 1)){
+                    items = 0;
+                    urls.push(window.location + '?infiniteScrollNewsLoader=true&ids=' + ids.join('-'));
+                    ids = [];
+                }
+            });
+            return urls;
+        })();
+
+        
+        /**
+         * Generate the NewsInfiniteScroll object
+         * requires news_infinite_scroll.js
+         * @type {NewsInfiniteScroll}
+         */
+        var newsInfiniteScroll = new NewsInfiniteScroll({
+            // Required options
+            loadAllOnDomready: false, // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
+            arrUrls: arrUrl,
+
+            // Optional settings
+            scrollContainer: $(window), // Normally the window object or a css selector required ex. '#scrollContainer'
+            container: '.mod_newslist', // css selector required
+            bottomPixels: 50,
+            fadeInTime: 600, // fading time in milliseconds
+            msgText: '<em>Lade weitere Nachrichten. Einen Moment bitte...</em>',
+            anchorPoint: '.mod_newslist', // application will start loading items, when window reaches the element's (scrollContainer's) bottom (css selector required)
+
+            // Callbacks
+            onInitialize: function (instance) {
+            },
+
+            onXHRStart: function(instance){
+            },
+
+            onXHRComplete: function(response, instance){
+                var html = '';
+                var arrResponse = response.split('***####***####***');
+                if (arrResponse[0] == 'success') {
+
+                    // get html from loaded news articles
+                    html = arrResponse[2];
+
+                    // Remove the h3 javascript
+                    html = html.toString().replace(/\<script(.*?)\<\/script\>/gi, '');
+                }else{
+                    // Send error
+                    instance.error = true;
+                }
+                return html;
+            },
+
+            onXHRFail: function (instance) {
+                console.log('Keine Antwort vom Server mit der Adresse: ' + instance.url);
+            },
+
+            onAppendCallback: function(instance){
+                // Set year headline or not
+                var arrYear = [];
+                $('.headline_news_year').each(function (index) {
+                    if ($(this).html() != '') {
+                        arrYear[$(this).html()] = $(this).html();
+                    }
+                });
+
+                $('.headline_news_year').each(function (index) {
+                    var deleteHeadline = true;
+                    if ($(this).html() == '' && $(this).attr('data-year') != '') {
+                        var curYear = $(this).attr('data-year');
+                        if (!arrYear[curYear]) {
+                            //alert(curYear);
+                            arrYear[curYear] = curYear;
+                            $(this).html(curYear);
+                            deleteHeadline = false;
+                        }
+
+                        if (deleteHeadline === true) {
+                            $(this).remove();
+                        }
+                    }
+                });
+
+                // Remove and add css classes to loaded items
+                var articles = $('.mod_newslist > div');
+                articles.removeClass('first last odd even');
+                articles.first().addClass('first');
+                articles.last().addClass('last');
+                $('.mod_newslist > div:even').addClass('even');
+                $('.mod_newslist > div:odd').addClass('odd');
+            }
+        });
+
+
+    });
+}(jQuery));
+</script>
+<?php endif; ?>
+<?php endif; ?>
