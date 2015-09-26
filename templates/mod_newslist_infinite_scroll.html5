@@ -90,7 +90,6 @@
                     if ($(this).html() == '' && $(this).attr('data-year') != '') {
                         var curYear = $(this).attr('data-year');
                         if (!arrYear[curYear]) {
-                            //alert(curYear);
                             arrYear[curYear] = curYear;
                             $(this).html(curYear);
                             deleteHeadline = false;

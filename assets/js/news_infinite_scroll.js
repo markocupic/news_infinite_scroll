@@ -1,6 +1,6 @@
 /**
  * NewsInfiniteScroll
- *
+ * https://github.com/markocupic/news_infinite_scroll
  * Marko Cupic, Oberkirch (Switzerland)
  * Copyright 2015
  */
