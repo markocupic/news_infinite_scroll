@@ -1,9 +1,9 @@
 <?php if(\Environment::get('isAjaxRequest')): ?>
-    <?php if (!empty($this->articles)): ?>
-    <?= implode('', $this->articles) ?>
-    <?php endif; ?>
-<?php else: ?>
-<?php if ($this->ids != ''): ?>
+<?php if (!empty($this->articles)): ?>
+<?= implode('', $this->articles) ?>
+        <?php endif; ?>
+        <?php else: ?>
+        <?php if ($this->ids != ''): ?>
 <script>
 
 (function ($) {
@@ -19,23 +19,22 @@
         var newsInfiniteScroll = new NewsInfiniteScroll({
             // Array with news-ids
             ids: ids,
-            // CSS selector: Abbend loaded items to this container
+            // CSS selector: Append loaded items to this container
             newsContainer: '.mod_newslist',
             // CSS selector: Default to $(window)
             scrollContainer: $(window),
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
             // Load x items per request
-            itemsPerRequest: 10,
+            itemsPerRequest: 8,
             // CSS selector: When you scroll and the window has reached the anchor point, requests will start
             anchorPoint: '.mod_newslist',
             // Distance in px from the top of the anchorPoint
-            bottomPixels: 10,
+            bottomPixels: 600,
             // Integer: Fading time for loades news items
-            fadeInTime: 800,
+            fadeInTime: 0,
             // HTML: Show this message during the loading process
-            msgText: '<em>Loading...</em>',
-
+            msgText: '<em>Lade weitere Nachrichten. Einen Moment bitte...</em>',
 
 
             // Callbacks
@@ -44,16 +43,16 @@
              * @param instance
              */
             onInitialize: function (instance) {
-                $('.mod_portfoliolist').addClass('row');
-                $('.mod_portfoliolist  > div').addClass('col-md-3');
-
+                //
             },
 
             /**
              *
              * @param instance
              */
-            onXHRStart: function(instance){},
+            onXHRStart: function (instance) {
+                //
+            },
 
             /**
              *
@@ -61,7 +60,7 @@
              * @param instance
              * @returns string
              */
-            onXHRComplete: function(html, instance){
+            onXHRComplete: function (html, instance) {
                 return html;
             },
 
@@ -77,10 +76,10 @@
              *
              * @param instance
              */
-            onAppendCallback: function(instance){}
+            onAppendCallback: function (instance) {
+                //
+            }
         });
-
-
     });
 }(jQuery));
 

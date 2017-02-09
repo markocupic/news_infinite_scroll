@@ -91,11 +91,13 @@
                 return;
             }
             var i = 0;
+            var m = 0;
             var arrIds = [];
             $.each(_opts.ids, function (index, id) {
                 i++;
+                m++;
                 arrIds.push(id);
-                if (i == _opts.itemsPerRequest) {
+                if (i == _opts.itemsPerRequest || _opts.ids.length == m) {
                     _arrUrls.push(window.location.href + '?ids=' + arrIds.join('-'));
                     i = 0;
                     arrIds = [];
