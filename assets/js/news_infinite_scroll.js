@@ -2,7 +2,7 @@
  * NewsInfiniteScroll
  * https://github.com/markocupic/news_infinite_scroll
  * Marko Cupic, Oberkirch (Switzerland)
- * Copyright 2015
+ * Copyright 2017
  */
 
 (function ($) {
@@ -10,17 +10,27 @@
      * @param {Object} options
      */
     NewsInfiniteScroll = function (options) {
-        var opts = $.extend({
+        var _opts = $.extend({
             // Defaults
-            arrUrls: [],
+            // Array with news-ids
+            ids: [],
+            // CSS selector: Abbend loaded items to this container
+            newsContainer: '.mod_newslist',
+            // CSS selector: Default to $(window)
+            scrollContainer: $(window),
+            // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
-            bottomPixels: 0,
-            container: '.mod_newslist',
-            fadeInTime: 800,
-            msgText: '',
-            scrollContainer: '',
-            // css selector
+            // Load x items per request
+            itemsPerRequest: 10,
+            // CSS selector: When you scroll and the window has reached the anchor point, requests will start
             anchorPoint: '',
+            // Distance in px from the top of the anchorPoint
+            bottomPixels: 0,
+            // Integer: Fading time for loades news items
+            fadeInTime: 800,
+            // HTML: Show this message during the loading process
+            msgText: '<em>Loading...</em>',
+
 
             // Callbacks
             onInitialize: function (instance) {
@@ -31,7 +41,6 @@
                 return response;
             },
             onXHRFail: function (instance) {
-
             },
             onAppendCallback: function (instance) {
             }
@@ -39,16 +48,19 @@
 
 
         // Private variables
-        var self = this;
-        var container = null;
-        var blnLoading = 0;
-        var blnStopRequesting = 0;
-        var interval = 0;
+        var _self = this;
+        var _newsContainer = null;
+        var _anchorPoint = null;
+        var _scrollContainer = null;
+        var _blnLoadingInProcess = 0;
+        var _arrUrls = [];
+        var _blnLoadedAllItems = 0;
+        var _xhrInterval = 0;
 
         // Public variables
-        self.error = false;
-        self.url = '';
-        self.urlIndex = 0;
+        _self.blnHasError = false;
+        _self.currentUrl = '';
+        _self.urlIndex = 0;
 
         /** Public Methods **/
 
@@ -58,9 +70,9 @@
          * @returns {boolean|string}
          */
         this.getOption = function (option) {
-            if (typeof opts[option] !== 'undefined') {
+            if (typeof _opts[option] !== 'undefined') {
 
-                return opts[option];
+                return _opts[option];
             }
             return false;
         };
@@ -70,43 +82,61 @@
         /**
          * Init function
          */
-        var initialize = function () {
+        var _initialize = function () {
             // Call onInitialize-callback
-            opts.onInitialize(self);
+            _opts.onInitialize(_self);
 
-            container = $(opts.container)[0];
-            if (typeof container === 'undefined') {
-                console.log('NewsInfiniteScroll aborted! Define a valid container in the template settings.');
+            if (_opts.ids.length < 1) {
+                console.log('NewsInfiniteScroll aborted! There are no items to load.');
+                return;
+            }
+            var i = 0;
+            var arrIds = [];
+            $.each(_opts.ids, function (index, id) {
+                i++;
+                arrIds.push(id);
+                if (i == _opts.itemsPerRequest) {
+                    _arrUrls.push(window.location.href + '?ids=' + arrIds.join('-'));
+                    i = 0;
+                    arrIds = [];
+                }
+            });
+
+            // newsContainer
+            _newsContainer = $(_opts.newsContainer)[0];
+            if (typeof _newsContainer === 'undefined') {
+                console.log('NewsInfiniteScroll aborted! Define a valid newsContainer in the template settings.');
                 return;
             }
 
-            if (opts.bottomPixels == 0) {
-                opts.bottomPixels = 1;
+            // scrollContainer
+            _scrollContainer = $(_opts.scrollContainer)[0];
+            if (typeof _scrollContainer === 'undefined') {
+                console.log('NewsInfiniteScroll aborted! Please select a valid scroll container.');
+                return;
+            }
+
+            // Bottom Pixels
+            if (_opts.bottomPixels == 0) {
+                _opts.bottomPixels = 1;
             }
 
             // anchor points settings
-            var anchorPoint = $(container);
-            if (typeof $(opts.anchorPoint)[0] !== 'undefined') {
-                anchorPoint = $(opts.anchorPoint)[0];
+            _anchorPoint = $(_newsContainer);
+            if (typeof $(_opts.anchorPoint)[0] !== 'undefined') {
+                _anchorPoint = $(_opts.anchorPoint)[0];
             }
 
-            // scrollContainer
-            var scrollContainer = $(window);
-            if (opts.scrollContainer != '') {
-                if (typeof $(opts.scrollContainer)[0] !== 'undefined') {
-                    scrollContainer = $(opts.scrollContainer)[0];
-                }
-            }
 
             // Load elements on domready or load them when scrolling to the bottom
-            if (opts.loadAllOnDomready === true) {
-                load();
-                interval = setInterval(load, 3000);
+            if (_opts.loadAllOnDomready === true) {
+                _load();
+                _xhrInterval = setInterval(_load, 3000);
             } else {
-                // Load content by event scroll
-                $(scrollContainer).on('scroll', function () {
-                    if ($(scrollContainer).scrollTop() > ($(anchorPoint).offset().top + $(anchorPoint).innerHeight() - $(scrollContainer).height() - opts.bottomPixels)) {
-                        load();
+                // load content by event scroll
+                $(_scrollContainer).on('scroll', function () {
+                    if ($(_scrollContainer).scrollTop() > ($(_anchorPoint).offset().top + $(_anchorPoint).innerHeight() - $(_scrollContainer).height() - _opts.bottomPixels)) {
+                        _load();
                     }
                 });
             }
@@ -116,53 +146,65 @@
         /**
          * Load html with xhr
          */
-        var load = function () {
+        var _load = function () {
 
-            if (blnLoading == 1 || blnStopRequesting == 1) return;
-            self.error = false;
+            if (_blnLoadingInProcess == 1 || _blnLoadedAllItems == 1) return;
+            _self.blnHasError = false;
 
-            if (opts.arrUrls.length == self.urlIndex) {
-                blnStopRequesting = 1;
-                if (typeof interval !== 'undefined') {
-                    clearInterval(interval);
+            if (_arrUrls.length == _self.urlIndex) {
+                _blnLoadedAllItems = 1;
+                if (typeof _xhrInterval !== 'undefined') {
+                    clearInterval(_xhrInterval);
                 }
             }
 
-            self.url = opts.arrUrls[self.urlIndex];
-            if (typeof self.url !== 'undefined') {
+            _self.currentUrl = _arrUrls[_self.urlIndex];
+            if (typeof _self.currentUrl !== 'undefined') {
                 $.ajax({
-                    url: self.url,
+                    url: _self.currentUrl,
                     beforeSend: function () {
                         // Call onXHRStart-Callback
-                        opts.onXHRStart(self);
+                        _opts.onXHRStart(_self);
 
-                        blnLoading = 1;
+                        _blnLoadingInProcess = 1;
 
-                        if (opts.msgText != '') {
+                        if (_opts.msgText != '') {
                             // Append Load Icon
-                            $(opts.msgText).addClass('infiniteScrollMsgText').appendTo(container).fadeIn(100);
+                            $(_opts.msgText).addClass('infiniteScrollMsgText').appendTo(_newsContainer).fadeIn(100);
                         }
                     }
-                }).done(function (response) {
-                    self.error = false;
-                    var html = opts.onXHRComplete(response, self);
-                    if (self.error === false) {
-                        self.urlIndex++;
-                        appendToDom(html);
+                }).done(function (data) {
+                    _self.blnHasError = false;
+                    var arrResponse = data.split('***####***####***');
+                    var response = {
+                        status: arrResponse[0],
+                        ids: arrResponse[1],
+                        html: arrResponse[2]
+                    };
+                    _self.response = response;
+                    var html = _opts.onXHRComplete(response.html, _self);
+                    if (_self.blnHasError === false) {
+                        _self.urlIndex++;
+                        setTimeout(function () {
+                            _appendToDom(html);
+                        }, 1000);
                     } else {
-                        fail();
+                        _fail();
                     }
                 }).fail(function () {
-                    fail();
+                    _fail();
                 }).always(function () {
-                    // Remove Load Icon
-                    $('.infiniteScrollMsgText').remove();
-                    blnLoading = 0;
+                    setTimeout(function () {
+                        // Remove Load Icon
+                        $('.infiniteScrollMsgText').remove();
+                        _blnLoadingInProcess = 0;
+                    }, 1000);
+
                 })
             } else {
-                blnStopRequesting = 1;
-                if (typeof interval !== 'undefined') {
-                    clearInterval(interval);
+                _blnLoadedAllItems = 1;
+                if (typeof _xhrInterval !== 'undefined') {
+                    clearInterval(_xhrInterval);
                 }
             }
         };
@@ -170,26 +212,26 @@
         /**
          * Fail Method
          */
-        var fail = function () {
+        var _fail = function () {
 
-            blnLoading = 0;
+            _blnLoadingInProcess = 0;
             // Call onXHRFail-callback
-            opts.onXHRFail(self);
+            _opts.onXHRFail(_self);
         };
 
         /**
          * Append items to DOM
          * @param html
          */
-        var appendToDom = function (html) {
+        var _appendToDom = function (html) {
             // Append html to dom and fade in
-            $(html).hide().appendTo(container).fadeIn(opts.fadeInTime);
+            $(html).hide().appendTo(_newsContainer).fadeIn(_opts.fadeInTime);
 
             // Call onAppendCallback-callback
-            opts.onAppendCallback(self);
+            _opts.onAppendCallback(_self);
         }
 
         // Start procedure
-        initialize();
+        _initialize();
     };
 })(jQuery);
