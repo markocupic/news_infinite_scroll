@@ -10,11 +10,16 @@ Wenn alles richtig installiert wurde, werden nun die nachgeladenen Elemente zu d
 
 ##Manual
 ![Frontend](manual/infiniteScroll_1.jpg?raw=true "Frontend")
+So sieht es im Frontend aus. Wenn Beiträge geladen werden, wird dies mit "Loading" unten angezeigt. Der Text kann im Template angepasst werden oder durch ein Icon ersetzt werden.
+
 ![Backend](manual/infiniteScroll_2.jpg?raw=true "Backend")
 Im Artikel müssen 2 Module eingebunden werden. Ein gewöhnliches Listing Modul mit den Beiträgen, die bei Domready bereits sichtbar sein müssen. Und ein NewsInfiniteScrollModul, das die restlichen Beiträge beim Hinunterscrollen vom Server per xhr-request nachlädt.
+
 ![Backend](manual/infiniteScroll_3.jpg?raw=true "Backend")
 Das Core Listing Modul mit den nötigen Einstellungen.
+
 ![Backend](manual/infiniteScroll_4.jpg?raw=true "Backend")
 Das NewsInfiniteScrollModul mit den nötigen Einstellungen. Steht die "Gesamtzahl der Beiträge" auf 0, lädt Contao aus irgend inem Grund nicht alle Beiträge. Hier also immer eine sehr grosse Zahl eingeben.
+
 ![Backend](manual/infiniteScroll_5.jpg?raw=true "Backend")
 Im Template können noch mehr Einstellungen getätigt werden.
