@@ -1,9 +1,9 @@
 <?php if(\Environment::get('isAjaxRequest')): ?>
-<?php if (!empty($this->articles)): ?>
-<?= implode('', $this->articles) ?>
-        <?php endif; ?>
-        <?php else: ?>
-        <?php if ($this->ids != ''): ?>
+    <?php if (!empty($this->articles)): ?>
+    <?= implode('', $this->articles) ?>
+    <?php endif; ?>
+<?php else: ?>
+<?php if ($this->ids != ''): ?>
 <script>
 
 (function ($) {
@@ -26,15 +26,16 @@
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
             // Load x items per request
-            itemsPerRequest: 8,
+            itemsPerRequest: 10,
             // CSS selector: When you scroll and the window has reached the anchor point, requests will start
             anchorPoint: '.mod_newslist',
             // Distance in px from the top of the anchorPoint
-            bottomPixels: 600,
+            bottomPixels: 10,
             // Integer: Fading time for loades news items
-            fadeInTime: 0,
+            fadeInTime: 800,
             // HTML: Show this message during the loading process
-            msgText: '<em>Lade weitere Nachrichten. Einen Moment bitte...</em>',
+            msgText: '<em>Loading...</em>',
+
 
 
             // Callbacks
@@ -43,16 +44,16 @@
              * @param instance
              */
             onInitialize: function (instance) {
-                //
+                $('.mod_portfoliolist').addClass('row');
+                $('.mod_portfoliolist  > div').addClass('col-md-3');
+
             },
 
             /**
              *
              * @param instance
              */
-            onXHRStart: function (instance) {
-                //
-            },
+            onXHRStart: function(instance){},
 
             /**
              *
@@ -60,7 +61,7 @@
              * @param instance
              * @returns string
              */
-            onXHRComplete: function (html, instance) {
+            onXHRComplete: function(html, instance){
                 return html;
             },
 
@@ -76,10 +77,10 @@
              *
              * @param instance
              */
-            onAppendCallback: function (instance) {
-                //
-            }
+            onAppendCallback: function(instance){}
         });
+
+
     });
 }(jQuery));
 

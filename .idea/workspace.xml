@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="373531bf-2182-4cf8-994c-dd164164fd0b" name="Default" comment="">
-      <change type="MOVED" beforePath="C:\Users\Marko\Documents\GitHub\news_infinite_scroll\languages\en\modules.xlf" afterPath="$PROJECT_DIR$/languages/en/modules.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ModuleNewsListInfiniteScroll.php" afterPath="$PROJECT_DIR$/modules/ModuleNewsListInfiniteScroll.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/mod_newslist_infinite_scroll.html5" afterPath="$PROJECT_DIR$/templates/mod_newslist_infinite_scroll.html5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/assets/js/news_infinite_scroll.js" afterPath="$PROJECT_DIR$/assets/js/news_infinite_scroll.js" />
-    </list>
+    <list default="true" id="373531bf-2182-4cf8-994c-dd164164fd0b" name="Default" comment="" />
     <ignored path="news_infinite_scroll.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />

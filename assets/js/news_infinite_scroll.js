@@ -91,13 +91,11 @@
                 return;
             }
             var i = 0;
-            var m = 0;
             var arrIds = [];
             $.each(_opts.ids, function (index, id) {
                 i++;
-                m++;
                 arrIds.push(id);
-                if (i == _opts.itemsPerRequest || _opts.ids.length == m) {
+                if (i == _opts.itemsPerRequest) {
                     _arrUrls.push(window.location.href + '?ids=' + arrIds.join('-'));
                     i = 0;
                     arrIds = [];
@@ -172,7 +170,7 @@
 
                         if (_opts.msgText != '') {
                             // Append Load Icon
-                            $(_opts.msgText).addClass('infiniteScrollMsgText').appendTo(_newsContainer).fadeIn(100);
+                            $(_opts.msgText).addClass('infiniteScrollMsgText').insertAfter(_newsContainer).fadeIn(100);
                         }
                     }
                 }).done(function (data) {
