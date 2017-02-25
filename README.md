@@ -22,7 +22,8 @@ Das Core Listing Modul mit den nötigen Einstellungen.
 
 
 ![Backend](manual/infiniteScroll_4.jpg?raw=true "Backend")
-Das NewsInfiniteScrollModul mit den nötigen Einstellungen. Steht die "Gesamtzahl der Beiträge" auf 0, lädt Contao aus irgend inem Grund nicht alle Beiträge. Hier also immer eine sehr grosse Zahl eingeben.
+Das NewsInfiniteScrollModul mit den nötigen Einstellungen.
+Achtung!!! Steht die "Gesamtzahl der Beiträge" auf 0 und ist der Offset grösser als 0, lädt Contao standardmässig nur 30 Beiträge. Wenn alle Beiträge geladen werden sollen, muss beim Feld "Gesamtzahl der Beiträge" eine genügend grosse Zahl (maximum 65535) eingegeben werden.
 
 
 ![Backend](manual/infiniteScroll_5.jpg?raw=true "Backend")
