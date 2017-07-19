@@ -48,6 +48,14 @@ class ModuleNewsListInfiniteScroll extends \ModuleNews
         }
 
 
+        // Do not add page to the search index on ajax calls
+        if (\Environment::get('isAjaxRequest'))
+        {
+            global $objPage;
+            $objPage->noSearch = true;
+        }
+
+
         $this->news_archives = $this->sortOutProtected(deserialize($this->news_archives));
 
         // Return if there are no archives
