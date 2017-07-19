@@ -3,7 +3,7 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (c) 2005-2015 Leo Feyer
+ * Copyright (c) 2005-2017 Leo Feyer
  *
  * @license LGPL-3.0+
  */
@@ -24,5 +24,6 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
-	'mod_newslist_infinite_scroll' => 'system/modules/news_infinite_scroll/templates',
+	'mod_infinite_scroll_blank'  => 'system/modules/news_infinite_scroll/templates/modules',
+	'j_newslist_infinite_scroll' => 'system/modules/news_infinite_scroll/templates/jquery',
 ));

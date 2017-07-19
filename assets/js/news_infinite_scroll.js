@@ -12,18 +12,17 @@
     NewsInfiniteScroll = function (options) {
         var _opts = $.extend({
             // Defaults
-            // Array with news-ids
-            ids: [],
+
             // CSS selector: Abbend loaded items to this container
-            newsContainer: '.mod_newslist',
+            newsContainer: '.mod_newslist_infinite_scroll',
             // CSS selector: Default to $(window)
             scrollContainer: $(window),
+            // CSS selector: Pagination links (<a href="infinite?page_n193=5" class="link page-link" title="Gehe zu Seite 5">5</a>)
+            paginationLinks:  '.pagination .link.page-link',
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
-            // Load x items per request
-            itemsPerRequest: 10,
             // CSS selector: When you scroll and the window has reached the anchor point, requests will start
-            anchorPoint: '',
+            anchorPoint: '.mod_newslist_infinite_scroll',
             // Distance in px from the top of the anchorPoint
             bottomPixels: 0,
             // Integer: Fading time for loades news items
@@ -61,6 +60,8 @@
         _self.blnHasError = false;
         _self.currentUrl = '';
         _self.urlIndex = 0;
+        _self.response = '';
+
 
         /** Public Methods **/
 
@@ -84,30 +85,21 @@
          */
         var _initialize = function () {
             // Call onInitialize-callback
-            _opts.onInitialize(_self);
-
-            if (_opts.ids.length < 1) {
-                console.log('NewsInfiniteScroll aborted! There are no items to load.');
+            if(_opts.onInitialize(_self) !== true){
                 return;
             }
-            var i = 0;
-            var arrIds = [];
-            $.each(_opts.ids, function (index, id) {
-                i++;
-                arrIds.push(id);
-                if (i == _opts.itemsPerRequest) {
-                    _arrUrls.push(window.location.href + '?ids=' + arrIds.join('-'));
-                    i = 0;
-                    arrIds = [];
-                }
-            });
 
             // newsContainer
             _newsContainer = $(_opts.newsContainer)[0];
             if (typeof _newsContainer === 'undefined') {
-                console.log('NewsInfiniteScroll aborted! Define a valid newsContainer in the template settings.');
                 return;
             }
+            // Get urls from pagination
+            $(_opts.newsContainer + ' ' + _opts.paginationLinks).each(function (){
+                _arrUrls.push($(this).prop('href'));
+            });
+
+
 
             // scrollContainer
             _scrollContainer = $(_opts.scrollContainer)[0];
@@ -165,9 +157,7 @@
                     beforeSend: function () {
                         // Call onXHRStart-Callback
                         _opts.onXHRStart(_self);
-
                         _blnLoadingInProcess = 1;
-
                         if (_opts.msgText != '') {
                             // Append Load Icon
                             $(_opts.msgText).addClass('infiniteScrollMsgText').insertAfter(_newsContainer).fadeIn(100);
@@ -175,14 +165,8 @@
                     }
                 }).done(function (data) {
                     _self.blnHasError = false;
-                    var arrResponse = data.split('***####***####***');
-                    var response = {
-                        status: arrResponse[0],
-                        ids: arrResponse[1],
-                        html: arrResponse[2]
-                    };
-                    _self.response = response;
-                    var html = _opts.onXHRComplete(response.html, _self);
+                    _self.response = data;
+                    var html = _opts.onXHRComplete( _self.response, _self);
                     if (_self.blnHasError === false) {
                         _self.urlIndex++;
                         setTimeout(function () {
@@ -199,7 +183,6 @@
                         $('.infiniteScrollMsgText').remove();
                         _blnLoadingInProcess = 0;
                     }, 1000);
-
                 })
             } else {
                 _blnLoadedAllItems = 1;
