@@ -1,0 +1,48 @@
+{
+  "name":"markocupic/news_infinite_scroll",
+  "description":"Add Infinite Scroll to the Contao Newslist Module",
+  "keywords":["contao", "infinite", "scroll", "newslist", "news"],
+  "type":"contao-module",
+  "license":"LGPL-3.0+",
+  "authors":[
+    {
+      "name":"Marko Cupic",
+      "homepage":"https://github.com/markocupic"
+    }
+  ],
+  "require":{
+    "php":">=5.4",
+    "contao/core-bundle":"~3.2 || ~4.1",
+    "contao-community-alliance/composer-plugin":"~2.4 || ~3.0"
+  },
+  "require-dev": {
+
+  },
+  "autoload":{
+    "psr-0": {
+
+    },
+    "classmap": [
+      "modules/"
+    ]
+  },
+  "replace": {
+    "contao-legacy/news_infinite_scroll": "self.version"
+  },
+  "extra":{
+    "branch-alias": {
+
+    },
+    "contao": {
+      "sources":{
+        "": "system/modules/news_infinite_scroll"
+      },
+      "transifex": {
+        "project": "contao_news_infinite_scroll",
+        "prefix": "master-contao_news_infinite_scroll-",
+        "languages_cto": "languages",
+        "languages_tx": ".tx"
+      }
+    }
+  }
+}
