@@ -21,6 +21,10 @@
             paginationLinks: '.pagination .link.page-link',
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
+            // Use a "load more button"
+            loadMoreButton: true,
+            // Load more button
+            loadMoreButtonMarkup: '<div><button>Load more</button></div>',
             // CSS selector: When you scroll and the window has reached the anchor point, requests will start
             anchorPoint: '.mod_newslist_infinite_scroll',
             // Distance in px from the top of the anchorPoint
@@ -28,7 +32,7 @@
             // Integer: Fading time for loades news items
             fadeInTime: 800,
             // HTML: Show this message during the loading process
-            msgText: '<em>Loading...</em>',
+            loadingInProcessContainer: '<div class="inf-scr-loading-in-process-container"><em>Loading...</em></div>',
 
 
             // Callbacks
@@ -61,6 +65,7 @@
         _self.currentUrl = '';
         _self.urlIndex = 0;
         _self.response = '';
+        _self.loadMoreBtn = null;
 
 
         /** Public Methods **/
@@ -123,6 +128,15 @@
             if (_opts.loadAllOnDomready === true) {
                 _load();
                 _xhrInterval = setInterval(_load, 3000);
+            }else if(_opts.loadMoreButton === true){
+                _self.loadMoreBtn =  $(_opts.loadMoreButtonMarkup);
+                _self.loadMoreBtn.insertAfter(_newsContainer)
+                _self.loadMoreBtn.addClass('inf-scr-load-more-btn-container');
+                _self.loadMoreBtn.click(function(event){
+                    $(this).hide();
+                    _load();
+                });
+
             } else {
                 // load content by event scroll
                 $(_scrollContainer).on('scroll', function () {
@@ -142,12 +156,7 @@
             if (_blnLoadingInProcess == 1 || _blnLoadedAllItems == 1) return;
             _self.blnHasError = false;
 
-            if (_arrUrls.length == _self.urlIndex) {
-                _blnLoadedAllItems = 1;
-                if (typeof _xhrInterval !== 'undefined') {
-                    clearInterval(_xhrInterval);
-                }
-            }
+
 
             _self.currentUrl = _arrUrls[_self.urlIndex];
             if (typeof _self.currentUrl !== 'undefined') {
@@ -161,9 +170,9 @@
                         $(_newsContainer).attr('aria-busy', 'true');
 
                         _blnLoadingInProcess = 1;
-                        if (_opts.msgText != '') {
+                        if (_opts.loadingInProcessContainer != '') {
                             // Append Load Icon
-                            $(_opts.msgText).addClass('infiniteScrollMsgText').insertAfter(_newsContainer).fadeIn(100);
+                            $(_opts.loadingInProcessContainer).addClass('inf-scr-loading-in-process-container').insertAfter(_newsContainer).fadeIn(100);
                         }
                     }
                 }).done(function (data) {
@@ -183,10 +192,30 @@
                 }).always(function () {
                     setTimeout(function () {
                         // Remove Load Icon
-                        $('.infiniteScrollMsgText').remove();
+                        $('.inf-scr-loading-in-process-container').remove();
 
                         // Set aria-busy propery to false
                         $(_newsContainer).attr('aria-busy', 'false');
+
+                        // If all items are loaded...
+                        if (_arrUrls.length == _self.urlIndex) {
+                            // Set _blnLoadedAllItems to true
+                            _blnLoadedAllItems = 1;
+
+                            // Remove the loadMoreButton
+                            _self.loadMoreBtn.remove();
+                            _self.loadMoreBtn = null;
+
+                            // Clear the autoloadInterval
+                            if (typeof _xhrInterval !== 'undefined') {
+                                clearInterval(_xhrInterval);
+                            }
+                        }
+
+                        if( _self.loadMoreBtn !== null)
+                        {
+                            _self.loadMoreBtn.show();
+                        }
 
                         _blnLoadingInProcess = 0;
                     }, 1000);
