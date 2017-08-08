@@ -2,16 +2,12 @@
     (function ($) {
         $(document).ready(function () {
 
-            //var ids = <?= $this->ids ?>;
-
             /**
              * Generate the NewsInfiniteScroll object
              * requires news_infinite_scroll.js
              * @type {NewsInfiniteScroll}
              */
             var newsInfiniteScroll = new NewsInfiniteScroll({
-                // Array with news-ids
-                //ids: ids,
                 // CSS selector: Append loaded items to this container
                 newsContainer: '.mod_newslist_infinite_scroll',
                 // CSS selector: Default to $(window)
@@ -84,10 +80,6 @@
                 onAppendCallback: function (instance) {
                 }
             });
-
-
         });
     }(jQuery));
-
-
 </script>
