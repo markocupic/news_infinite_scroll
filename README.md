@@ -8,3 +8,5 @@ Im Frontend sollten nun beim Erreichen des letzten Artikels durch Scrollen weite
 ## Einstellungen
 Die Standardeinstellungen können im Template "j_newslist_infinite_scroll" überschrieben werden. Das Template sollte dann updatesicher im templates Verzeichnis abgelegt werden.
 
+## See
+https://kletterkader.com/infinitescrolltest
