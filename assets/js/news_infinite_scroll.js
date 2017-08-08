@@ -18,7 +18,7 @@
             // CSS selector: Default to $(window)
             scrollContainer: $(window),
             // CSS selector: Pagination links (<a href="infinite?page_n193=5" class="link page-link" title="Gehe zu Seite 5">5</a>)
-            paginationLinks:  '.pagination .link.page-link',
+            paginationLinks: '.pagination .link.page-link',
             // When set to true, this will disable infinite scrolling and start firing ajax requests on domready with an interval of 3s
             loadAllOnDomready: false,
             // CSS selector: When you scroll and the window has reached the anchor point, requests will start
@@ -85,7 +85,7 @@
          */
         var _initialize = function () {
             // Call onInitialize-callback
-            if(_opts.onInitialize(_self) !== true){
+            if (_opts.onInitialize(_self) !== true) {
                 return;
             }
 
@@ -95,10 +95,9 @@
                 return;
             }
             // Get urls from pagination
-            $(_opts.newsContainer + ' ' + _opts.paginationLinks).each(function (){
+            $(_opts.newsContainer + ' ' + _opts.paginationLinks).each(function () {
                 _arrUrls.push($(this).prop('href'));
             });
-
 
 
             // scrollContainer
@@ -157,6 +156,10 @@
                     beforeSend: function () {
                         // Call onXHRStart-Callback
                         _opts.onXHRStart(_self);
+
+                        // Set aria-busy propery to true
+                        $(_newsContainer).attr('aria-busy', 'true');
+
                         _blnLoadingInProcess = 1;
                         if (_opts.msgText != '') {
                             // Append Load Icon
@@ -166,7 +169,7 @@
                 }).done(function (data) {
                     _self.blnHasError = false;
                     _self.response = data;
-                    var html = _opts.onXHRComplete( _self.response, _self);
+                    var html = _opts.onXHRComplete(_self.response, _self);
                     if (_self.blnHasError === false) {
                         _self.urlIndex++;
                         setTimeout(function () {
@@ -181,6 +184,10 @@
                     setTimeout(function () {
                         // Remove Load Icon
                         $('.infiniteScrollMsgText').remove();
+
+                        // Set aria-busy propery to false
+                        $(_newsContainer).attr('aria-busy', 'false');
+
                         _blnLoadingInProcess = 0;
                     }, 1000);
                 })
